@@ -93,19 +93,20 @@ export default function CustomerStories() {
             y: 30,
         });
 
-        gsap.to(contentRef.current, {
-            opacity: 1,
-            y: 0,
-            duration: 0.8,
-            ease: "causality",
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top 80%",
-            },
+        const contentTrigger = ScrollTrigger.create({
+            trigger: containerRef.current,
+            start: "top 80%",
+            animation: gsap.to(contentRef.current, {
+                opacity: 1,
+                y: 0,
+                duration: 0.8,
+                ease: "causality",
+            }),
+            id: "customer-stories-content",
         });
 
         return () => {
-            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+            contentTrigger.kill();
         };
     }, []);
 
@@ -139,7 +140,7 @@ export default function CustomerStories() {
     const strokeDashoffset = circumference * (1 - progress);
 
     return (
-        <div ref={containerRef} className="relative border-t border-foreground/30 px-12 bg-background overflow-hidden">
+        <div ref={containerRef} className="relative border-t border-foreground/30 px-4 md:px-12 bg-background overflow-hidden">
             <div className="max-w-7xl mx-auto border-l border-r border-foreground/30 relative">
                 <div className="absolute inset-0 overflow-hidden">
                     <Image
@@ -149,14 +150,14 @@ export default function CustomerStories() {
                         className="object-cover"
                     />
                 </div>
-                <div ref={contentRef} className="p-8 min-h-[600px] flex flex-col justify-between relative z-10">
+                <div ref={contentRef} className="p-4 md:p-8 min-h-screen md:min-h-[600px] flex flex-col justify-between relative z-10">
                     {/* Top Label */}
                     <p className="text-foreground/70 uppercase font-sans font-medium text-[10px] tracking-wider">
                         Customer story
                     </p>
 
-                    <div className="flex-1 flex items-center">
-                        <h2 ref={headlineRef} className="font-serif font-medium text-5xl text-foreground tracking-tighter leading-[1.2] max-w-[680px]" style={{ textWrap: "balance" }}>
+                    <div className="flex-1 flex items-center py-6 md:py-0">
+                        <h2 ref={headlineRef} className="font-serif font-medium text-2xl md:text-5xl text-foreground tracking-tighter leading-[1.2] max-w-[680px]" style={{ textWrap: "balance" }}>
                             {currentStory.title.split("\n").map((line, lineIndex) => (
                                 <span key={`${currentIndex}-${lineIndex}`} className="block overflow-hidden">
                                     <span className="headline-line block">
@@ -226,7 +227,7 @@ export default function CustomerStories() {
                             </button>
                         </div>
 
-                        <div className="animate-slide w-32 h-14 flex items-center justify-end">
+                        <div className="animate-slide w-24 md:w-32 h-10 md:h-14 flex items-center justify-end">
                             <Image
                                 src={currentStory.logo}
                                 alt="Customer logo"

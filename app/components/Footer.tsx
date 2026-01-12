@@ -4,47 +4,30 @@ import AnimatedLink from "./AnimatedLink";
 
 export default function Footer() {
     return (
-        <div className="px-12 border-t border-foreground/30 bg-background">
-            <div className="max-w-7xl mx-auto px-12 py-12 border-l border-r border-foreground/30 space-y-32">
-                <div className="flex">
-                    <Link href="">
-                        <Image src="/images/ce-logo.svg" alt="Logo" className="w-24 h-auto" width={100} height={100} />
+        <div className="px-4 md:px-12 border-t border-foreground/30 bg-background">
+            <div className="max-w-7xl mx-auto px-4 md:px-12 py-8 md:py-12 border-l border-r border-foreground/30 space-y-12 md:space-y-32">
+                <div className="flex flex-col md:flex-row gap-8 md:gap-0">
+                    <Link href="/">
+                        <Image src="/images/ce-logo.svg" alt="Logo" className="w-20 md:w-24 h-auto" width={100} height={100} />
                     </Link>
 
-                    <div className="flex justify-end w-full">
-                        <div className="max-w-[160px] w-full flex flex-col gap-2">
-                            <p className="font-medium font-sans text-sm">Label</p>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
+                    <div className="grid grid-cols-2 md:flex md:justify-end w-full gap-6 md:gap-0">
+                        <div className="md:max-w-[160px] md:w-full flex flex-col gap-2">
+                            <p className="font-medium font-sans text-sm">Product</p>
+                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="/pricing">Pricing</AnimatedLink>
+                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="/resources">Resources</AnimatedLink>
                         </div>
-                        <div className="max-w-[160px] w-full flex flex-col gap-2">
-                            <p className="font-medium font-sans text-sm">Label</p>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                        </div>
-                        <div className="max-w-[160px] w-full flex flex-col gap-2">
-                            <p className="font-medium font-sans text-sm">Label</p>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="">Page link</AnimatedLink>
+                        <div className="md:max-w-[160px] md:w-full flex flex-col gap-2">
+                            <p className="font-medium font-sans text-sm">Account</p>
+                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="/signin">Sign in</AnimatedLink>
+                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="/signup">Sign up</AnimatedLink>
                         </div>
                     </div>
                 </div>
 
-                <div className="relative flex items-center justify-between">
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-6 md:gap-0 md:justify-between">
                     {/* Social Icons */}
-                    <div className="flex gap-1">
+                    <div className="flex gap-1 order-1 md:order-none">
                         <a
                             href="https://instagram.com"
                             target="_blank"
@@ -78,7 +61,7 @@ export default function Footer() {
                     </div>
 
                     {/* Legal Links */}
-                    <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-6">
+                    <div className="flex flex-wrap items-center gap-4 md:gap-6 order-2 md:order-none md:absolute md:left-1/2 md:-translate-x-1/2">
                         <AnimatedLink href="/privacy" className="font-sans text-[10px] text-foreground/70 tracking-tight">
                             Privacy Policy
                         </AnimatedLink>
@@ -91,7 +74,7 @@ export default function Footer() {
                     </div>
 
                     {/* Copyright */}
-                    <p className="font-sans text-[10px] text-foreground/70 tracking-tight">
+                    <p className="font-sans text-[10px] text-foreground/70 tracking-tight order-3 md:order-none">
                         © Copyright 2026, Causality Engine
                     </p>
                 </div>

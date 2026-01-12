@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect } from "react";
+import { useRef, useLayoutEffect } from "react";
 import { gsap } from "@/app/lib/gsap";
 
 interface SplitTextProps {
@@ -22,7 +22,7 @@ export default function SplitText({
 }: SplitTextProps) {
   const linesRef = useRef<(HTMLSpanElement | null)[]>([]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const lines = linesRef.current.filter(Boolean);
 
     gsap.set(lines, {
@@ -47,7 +47,7 @@ export default function SplitText({
   return (
     <Tag className={className}>
       {lines.map((line, lineIndex) => (
-        <span key={lineIndex} className="block overflow-hidden">
+        <span key={lineIndex} className="block overflow-hidden pb-1">
           <span
             ref={(el) => {
               linesRef.current[lineIndex] = el;

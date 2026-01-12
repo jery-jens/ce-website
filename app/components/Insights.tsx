@@ -49,10 +49,10 @@ const posts: InsightPost[] = [
 
 export default function Insights() {
     return (
-        <div className="px-12 bg-foreground" data-header-theme="light">
+        <div className="px-4 md:px-12 bg-foreground" data-header-theme="light">
             <div className="max-w-7xl mx-auto border-l border-r border-background/30">
-                <div className="flex items-end justify-between px-8 pt-20 pb-12 border-b border-background/30">
-                    <h2 className="font-serif text-background font-medium text-[32px] tracking-tighter leading-[1.2]">
+                <div className="flex items-end justify-between px-4 md:px-8 pt-12 md:pt-20 pb-8 md:pb-12 border-b border-background/30">
+                    <h2 className="font-serif text-background font-medium text-2xl md:text-[32px] tracking-tighter leading-[1.2]">
                         Latest news
                     </h2>
                     <AnimatedLink href="/blog" className="font-sans font-medium text-sm text-background/70 relative group" showUnderline>
@@ -64,18 +64,19 @@ export default function Insights() {
                     <Link
                         key={index}
                         href={post.href}
-                        className={`insight-post flex gap-32 items-start p-8 ${index < posts.length - 1 ? 'border-b border-background/30' : ''} hover:bg-background/[0.02] transition-colors`}
+                        className={`insight-post flex flex-col md:flex-row gap-4 md:gap-32 items-start p-4 md:p-8 ${index < posts.length - 1 ? 'border-b border-background/30' : ''} hover:bg-background/[0.02] transition-colors`}
                     >
-                        <div className="flex flex-col gap-2 shrink-0 w-[120px]">
+                        <div className="flex flex-row md:flex-col gap-2 shrink-0 md:w-[120px]">
                             <p className="font-sans font-medium text-sm text-background">
                                 {post.category}
                             </p>
+                            <span className="md:hidden text-background/40">·</span>
                             <p className="font-sans font-medium text-sm text-background/60">
                                 {post.date}
                             </p>
                         </div>
-                        <div className="flex flex-col gap-4 max-w-[480px]">
-                            <h3 className="font-sans font-medium text-xl text-background">
+                        <div className="flex flex-col gap-2 md:gap-4 max-w-[480px]">
+                            <h3 className="font-sans font-medium text-base md:text-xl text-background">
                                 {post.title}
                             </h3>
                             <p className="font-sans text-sm text-background/60 leading-[1.5]">

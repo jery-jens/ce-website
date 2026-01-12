@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, MouseEvent } from "react";
+import { useRouter, usePathname } from "next/navigation";
 import { gsap, ScrollTrigger } from "@/app/lib/gsap";
 import Button from "./Button";
 
@@ -17,6 +18,8 @@ function MenuLink({ href, children, onClick, className = "" }: MenuLinkProps) {
   const linkRef = useRef<HTMLAnchorElement>(null);
   const textRef = useRef<HTMLSpanElement>(null);
   const cloneRef = useRef<HTMLSpanElement>(null);
+  const router = useRouter();
+  const pathname = usePathname();
 
   const handleMouseEnter = () => {
     gsap.to(textRef.current, {
@@ -52,11 +55,39 @@ function MenuLink({ href, children, onClick, className = "" }: MenuLinkProps) {
     });
   };
 
+  const handleClick = (e: MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    if (onClick) onClick();
+
+    // If already on the same page, don't animate - just scroll to top
+    if (pathname === href) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
+
+    const container = document.querySelector(".page-transition");
+    if (!container) {
+      router.push(href);
+      return;
+    }
+
+    gsap.to(container, {
+      opacity: 0,
+      filter: "blur(12px)",
+      scale: 0.98,
+      duration: 0.4,
+      ease: "causality",
+      onComplete: () => {
+        router.push(href);
+      },
+    });
+  };
+
   return (
     <Link
       ref={linkRef}
       href={href}
-      onClick={onClick}
+      onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={`menu-link relative block ${className}`}
@@ -78,6 +109,8 @@ function MenuLink({ href, children, onClick, className = "" }: MenuLinkProps) {
 }
 
 export default function Header() {
+  const router = useRouter();
+  const pathname = usePathname();
   const headerRef = useRef<HTMLElement>(null);
   const navRef = useRef<HTMLElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -88,12 +121,13 @@ export default function Header() {
   const menuPanelRef = useRef<HTMLDivElement>(null);
   const menuLinksRef = useRef<HTMLDivElement>(null);
   const socialIconsRef = useRef<HTMLDivElement>(null);
-  const videoRef = useRef<HTMLDivElement>(null);
+  const videoRef = useRef<HTMLAnchorElement>(null);
   const backdropRef = useRef<HTMLDivElement>(null);
   const [isOpen, setIsOpen] = useState(false);
   const [isLight, setIsLight] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  // Initial header animation (only once on mount)
   useEffect(() => {
     gsap.set(headerRef.current, {
       y: -20,
@@ -109,13 +143,31 @@ export default function Header() {
       delay: 1.2,
       ease: "causality",
     });
+  }, []);
 
-    // Detect light sections and update header theme after a short delay to ensure DOM is ready
+  // Setup ScrollTriggers - re-run when pathname changes
+  useEffect(() => {
+    // Reset light state when navigating
+    setIsLight(false);
+    setIsScrolled(false);
+
+    // Kill only header-related triggers before creating new ones
+    ScrollTrigger.getAll().forEach((trigger) => {
+      const id = trigger.vars.id as string | undefined;
+      if (id?.startsWith("header-")) {
+        trigger.kill();
+      }
+    });
+
+    // Store created triggers for cleanup
+    const headerTriggers: ScrollTrigger[] = [];
+
+    // Detect light sections and update header theme after a delay to ensure DOM is ready
     const setupLightSectionTriggers = () => {
       const lightSections = document.querySelectorAll('[data-header-theme="light"]');
 
-      lightSections.forEach((section) => {
-        ScrollTrigger.create({
+      lightSections.forEach((section, index) => {
+        const trigger = ScrollTrigger.create({
           trigger: section,
           start: "top 60px",
           end: "bottom 60px",
@@ -123,29 +175,38 @@ export default function Header() {
           onLeave: () => setIsLight(false),
           onEnterBack: () => setIsLight(true),
           onLeaveBack: () => setIsLight(false),
+          id: `header-light-section-${index}`,
         });
+        headerTriggers.push(trigger);
       });
+
+      // Scroll detection for compact header using ScrollTrigger (synced with Lenis)
+      const scrollTrigger = ScrollTrigger.create({
+        trigger: document.body,
+        start: "top -50px",
+        end: "max",
+        onUpdate: (self) => {
+          setIsScrolled(self.progress > 0);
+        },
+        id: "header-scroll-state",
+      });
+      headerTriggers.push(scrollTrigger);
 
       ScrollTrigger.refresh();
     };
 
-    // Wait for next frame to ensure all components are mounted
-    requestAnimationFrame(() => {
-      requestAnimationFrame(setupLightSectionTriggers);
-    });
-
-    // Scroll detection for compact header
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener("scroll", handleScroll);
+    // Wait for the page transition and DOM to be ready
+    const timer = setTimeout(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(setupLightSectionTriggers);
+      });
+    }, 100);
 
     return () => {
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
-      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(timer);
+      headerTriggers.forEach((trigger) => trigger.kill());
     };
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     // Kill any existing animations
@@ -287,22 +348,19 @@ export default function Header() {
         {/* Nav bar */}
       <div
         ref={containerRef}
-        className={`w-full transition-[max-width] duration-300 pointer-events-auto ${
+        className={`w-full h-[44px] transition-all duration-300 pointer-events-auto mx-4 md:mx-0 ${
           isLight && !isOpen ? 'bg-neutral-200' : 'bg-neutral-900'
-        } ${isScrolled && !isOpen ? 'max-w-sm' : 'max-w-xl'} rounded-full`}
-        style={{ height: isScrolled ? 38 : 44 }}
+        } ${isScrolled && !isOpen ? 'md:max-w-sm max-w-2xs' : 'md:max-w-xl max-w-xs'} rounded-full`}
       >
         <nav
           ref={navRef}
-          className={`flex items-center w-full justify-between p-1 ${
-            isScrolled ? 'h-[38px]' : 'h-[44px]'
-          }`}
+          className="relative flex items-center w-full justify-between p-1 h-[44px]"
         >
           <button
             onClick={handleMenuClick}
-            className={`flex items-center gap-2 px-4 rounded-full font-sans font-medium text-sm tracking-tight cursor-pointer transition-all duration-300 ${
+            className={`flex items-center gap-2 px-3 md:px-4 h-[34px] rounded-full font-sans font-medium text-sm tracking-tight cursor-pointer transition-all duration-300 ${
               isLight && !isOpen ? 'text-background' : 'text-foreground'
-            } ${isScrolled ? 'h-[30px]' : 'h-[34px]'}`}
+            }`}
           >
             <div className="relative w-[14px] h-[8px] flex flex-col justify-between">
               <span
@@ -318,10 +376,38 @@ export default function Header() {
                 }`}
               />
             </div>
-            <span ref={menuTextRef}>Menu</span>
+            <span ref={menuTextRef} className="hidden md:inline">Menu</span>
           </button>
 
-          <Link href="/" className="absolute left-1/2 top-[22px] -translate-x-1/2 -translate-y-1/2">
+          <Link
+            href="/"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2"
+            onClick={(e) => {
+              e.preventDefault();
+
+              // If already on home page, don't animate - just scroll to top
+              if (pathname === "/") {
+                window.scrollTo({ top: 0, behavior: "smooth" });
+                return;
+              }
+
+              const container = document.querySelector(".page-transition");
+              if (!container) {
+                router.push("/");
+                return;
+              }
+              gsap.to(container, {
+                opacity: 0,
+                filter: "blur(12px)",
+                scale: 0.98,
+                duration: 0.4,
+                ease: "causality",
+                onComplete: () => {
+                  router.push("/");
+                },
+              });
+            }}
+          >
             <Image
               ref={logoRef}
               src="/images/star.svg"
@@ -333,13 +419,13 @@ export default function Header() {
           </Link>
 
           <div className="flex items-center gap-1">
-            <div className={`transition-all duration-300 overflow-hidden ${isScrolled ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
+            <div className={`hidden md:block transition-all duration-300 overflow-hidden ${isScrolled ? 'w-0 opacity-0' : 'w-auto opacity-100'}`}>
               <Button variant="secondary" mode={isLight && !isOpen ? "light" : "dark"} href="/signin">
                 Sign in
               </Button>
             </div>
-            <Button variant="primary" mode={isLight && !isOpen ? "light" : "dark"} href="/signup" small={isScrolled}>
-              Start for free
+            <Button variant="primary" mode={isLight && !isOpen ? "light" : "dark"} href="/signup">
+              Try for free
             </Button>
           </div>
         </nav>
@@ -348,59 +434,52 @@ export default function Header() {
       {/* Detached Menu Panel */}
       <div
         ref={menuPanelRef}
-        className={`w-full max-w-xl mt-2 bg-neutral-900 rounded-lg overflow-hidden opacity-0 ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
+        className={`w-full mx-4 md:mx-0 md:max-w-xl max-w-xs mt-2 bg-neutral-900 rounded-lg overflow-hidden opacity-0 ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
       >
-        <div className="flex">
+        <div className="flex flex-col md:flex-row">
           {/* Left Column - Navigation */}
-          <div className="flex-1 p-6 flex flex-col justify-between">
+          <div className="flex-1 p-4 md:p-6 flex flex-col justify-between">
             <div>
-              <p className="menu-link text-foreground/40 text-[10px] font-sans font-medium tracking-wider uppercase mb-4">
+              <p className="menu-link text-foreground/40 text-[10px] font-sans font-medium tracking-wider uppercase mb-3 md:mb-4">
                 Explore
               </p>
               <nav ref={menuLinksRef} className="flex flex-col">
                 <MenuLink
                   href="/pricing"
                   onClick={() => setIsOpen(false)}
-                  className="text-foreground font-sans font-medium text-lg py-3 border-b border-foreground/10"
+                  className="text-foreground font-sans font-medium text-base md:text-lg py-2.5 md:py-3 border-b border-foreground/10"
                 >
                   Pricing
                 </MenuLink>
                 <MenuLink
                   href="/resources"
                   onClick={() => setIsOpen(false)}
-                  className="text-foreground font-sans font-medium text-lg py-3 border-b border-foreground/10"
+                  className="text-foreground font-sans font-medium text-base md:text-lg py-2.5 md:py-3"
                 >
                   Resources
-                </MenuLink>
-                <MenuLink
-                  href="/company"
-                  onClick={() => setIsOpen(false)}
-                  className="text-foreground font-sans font-medium text-lg py-3"
-                >
-                  Company
                 </MenuLink>
               </nav>
             </div>
 
             {/* Social Icons */}
-            <div ref={socialIconsRef} className="flex gap-2 mt-6">
+            <div ref={socialIconsRef} className="flex gap-1 mt-4 md:mt-6">
               <a
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/60 hover:text-foreground hover:border-foreground/30 transition-colors"
+                className="w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M12 2C6.477 2 2 6.477 2 12C2 17.523 6.477 22 12 22C17.523 22 22 17.523 22 12C22 6.477 17.523 2 12 2ZM12 7.5C14.485 7.5 16.5 9.515 16.5 12C16.5 14.485 14.485 16.5 12 16.5C9.515 16.5 7.5 14.485 7.5 12C7.5 9.515 9.515 7.5 12 7.5ZM12 9C10.343 9 9 10.343 9 12C9 13.657 10.343 15 12 15C13.657 15 15 13.657 15 12C15 10.343 13.657 9 12 9ZM17.25 7.5C17.25 7.914 16.914 8.25 16.5 8.25C16.086 8.25 15.75 7.914 15.75 7.5C15.75 7.086 16.086 6.75 16.5 6.75C16.914 6.75 17.25 7.086 17.25 7.5Z"/>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
                 </svg>
               </a>
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/60 hover:text-foreground hover:border-foreground/30 transition-colors"
+                className="w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M14 13.5H16.5L17.5 9.5H14V7.5C14 6.47 14 5.5 16 5.5H17.5V2.14C17.174 2.097 15.943 2 14.643 2C11.928 2 10 3.657 10 6.7V9.5H7V13.5H10V22H14V13.5Z"/>
                 </svg>
               </a>
@@ -408,16 +487,23 @@ export default function Header() {
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-8 h-8 rounded-full border border-foreground/10 flex items-center justify-center text-foreground/60 hover:text-foreground hover:border-foreground/30 transition-colors"
+                className="w-6 h-6 rounded-full bg-neutral-800 flex items-center justify-center text-foreground/60 hover:text-foreground transition-colors"
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M6.94 5C6.94 5.53 6.72 6.04 6.33 6.41C5.94 6.79 5.42 7 4.88 7C4.34 7 3.82 6.79 3.43 6.41C3.04 6.04 2.82 5.53 2.82 5C2.82 4.47 3.04 3.96 3.43 3.59C3.82 3.21 4.34 3 4.88 3C5.42 3 5.94 3.21 6.33 3.59C6.72 3.96 6.94 4.47 6.94 5ZM7 8.48H3V21H7V8.48ZM13.32 8.48H9.34V21H13.28V14.43C13.28 10.77 18.05 10.43 18.05 14.43V21H22V13.07C22 6.9 14.94 7.13 13.28 10.16L13.32 8.48Z"/>
                 </svg>
               </a>
             </div>
           </div>
 
-          <div ref={videoRef} className="w-[280px]">
+          {/* Video section - hidden on mobile */}
+          <a
+            ref={videoRef}
+            href="https://youtube.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="hidden md:block w-[280px]"
+          >
             <div className="relative h-full min-h-[280px] overflow-hidden bg-neutral-700">
               <Image
                 src="/images/joris-demo.jpeg"
@@ -426,14 +512,14 @@ export default function Header() {
                 className="object-cover"
               />
               <div className="absolute inset-0 bg-linear-to-b from-transparent from-30% to-black/90" />
-              <button className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 text-foreground cursor-pointer group">
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 text-foreground group">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="opacity-80 group-hover:opacity-100 transition-opacity">
                   <path d="M19.376 12.416L8.777 19.482A.5.5 0 0 1 8 19.066V4.934a.5.5 0 0 1 .777-.416l10.599 7.066a.5.5 0 0 1 0 .832z"/>
                 </svg>
                 <span className="text-xs font-sans font-medium tracking-tight">Play demo</span>
-              </button>
+              </div>
             </div>
-          </div>
+          </a>
         </div>
       </div>
     </header>

@@ -41,38 +41,39 @@ export default function CTA() {
             backgroundColor: "#ffffff",
         });
 
-        gsap.to(blockElements, {
-            backgroundColor: "#000000",
-            stagger: {
-                each: 0.02,
-                from: "random",
-            },
-            ease: "none",
-            scrollTrigger: {
-                trigger: gridRef.current,
-                start: "top 100%",
-                end: "top 20%",
-                scrub: true,
-            },
+        const ctaTrigger = ScrollTrigger.create({
+            trigger: gridRef.current,
+            start: "top 100%",
+            end: "top 20%",
+            scrub: true,
+            animation: gsap.to(blockElements, {
+                backgroundColor: "#000000",
+                stagger: {
+                    each: 0.02,
+                    from: "random",
+                },
+                ease: "none",
+            }),
+            id: "cta-blocks",
         });
 
         return () => {
-            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+            ctaTrigger.kill();
         };
     }, []);
 
     return (
         <div className="bg-foreground border-t border-background/30" data-header-theme="light">
-            <div className="px-12">
+            <div className="px-4 md:px-12">
                 <div className="border-l border-r border-background/30 max-w-7xl mx-auto">
-                    <div className="px-12 py-20">
+                    <div className="px-4 md:px-12 py-12 md:py-20">
                         <SplitText
                             as="h2"
-                            className="text-background text-7xl font-serif font-medium tracking-tighter leading-[90%]"
+                            className="text-background text-4xl md:text-7xl font-serif font-medium tracking-tighter leading-[1.1]"
                         >
                             {`Ad spend wasted.\nRevenue recovered.`}
                         </SplitText>
-                        <div className="flex gap-2 mt-8">
+                        <div className="flex flex-col sm:flex-row gap-2 mt-6 md:mt-8">
                             <Button variant="primary" mode="light">
                                 Start for free
                             </Button>
@@ -93,7 +94,7 @@ export default function CTA() {
                         />
                     ))}
                 </div>
-                <div className="absolute inset-0 pointer-events-none px-12">
+                <div className="absolute inset-0 pointer-events-none px-4 md:px-12">
                     <div className="max-w-7xl mx-auto h-full border-l border-r border-background/30"></div>
                 </div>
             </div>

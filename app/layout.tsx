@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import SmoothScroll from "./components/SmoothScroll";
+import PageTransition from "./components/PageTransition";
+import Header from "./components/Header";
 
 const interDisplay = localFont({
   src: [
@@ -31,9 +33,12 @@ const reckless = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Causality Engine - Ad Spend Attribution",
+  title: {
+    default: "Causality Engine — See what actually drives revenue",
+    template: "%s",
+  },
   description:
-    "Your spend keeps growing, but attribution stays blurry. Causality connects the dots, trims waste, and accelerates journey.",
+    "Go beyond correlation. Causality Engine reveals the true incremental impact of your marketing so you can optimize what actually works.",
 };
 
 export default function RootLayout({
@@ -46,7 +51,10 @@ export default function RootLayout({
       <body
         className={`${interDisplay.variable} ${reckless.variable} antialiased`}
       >
-        <SmoothScroll>{children}</SmoothScroll>
+        <SmoothScroll>
+          <Header />
+          <PageTransition>{children}</PageTransition>
+        </SmoothScroll>
       </body>
     </html>
   );

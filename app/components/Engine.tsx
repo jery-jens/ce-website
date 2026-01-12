@@ -77,7 +77,7 @@ function FeaturePill({ feature, isActive, onHover }: FeaturePillProps) {
 
     return (
         <div
-            className="feature-pill absolute"
+            className={`feature-pill absolute ${isActive ? "z-50" : "z-10"}`}
             style={{
                 top: feature.position.top,
                 left: feature.position.left,
@@ -86,10 +86,10 @@ function FeaturePill({ feature, isActive, onHover }: FeaturePillProps) {
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
         >
-            {/* Feature Card - positioned above pill */}
+            {/* Feature Card - positioned above pill, hidden on mobile */}
             <div
                 ref={cardRef}
-                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[200px] bg-neutral-800 rounded-lg overflow-hidden shadow-xl z-10 opacity-0 pointer-events-none"
+                className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 w-[200px] bg-neutral-800 rounded-lg overflow-hidden shadow-xl z-10 opacity-0 pointer-events-none hidden md:block"
             >
                 <div className="p-3 space-y-1">
                     <p className="font-sans font-medium text-sm text-foreground">
@@ -106,15 +106,15 @@ function FeaturePill({ feature, isActive, onHover }: FeaturePillProps) {
 
             {/* Pill button */}
             <button
-                className={`flex items-center gap-1.5 h-9 px-2 pr-4 rounded-full transition-colors cursor-pointer whitespace-nowrap ${
+                className={`flex items-center gap-1.5 h-7 md:h-9 px-1.5 md:px-2 pr-3 md:pr-4 rounded-full transition-colors md:cursor-pointer whitespace-nowrap ${
                     isActive
                         ? "bg-neutral-800"
-                        : "bg-background hover:bg-neutral-800"
+                        : "bg-background md:hover:bg-neutral-800"
                 }`}
             >
                 <span
                     ref={iconRef}
-                    className={`w-5 h-5 rounded-full flex items-center justify-center text-xs shrink-0 leading-none ${
+                    className={`w-4 h-4 md:w-5 md:h-5 rounded-full flex items-center justify-center text-xs shrink-0 leading-none ${
                         isActive ? "bg-orange-500 text-background" : "bg-foreground/20 text-foreground"
                     }`}
                 >
@@ -122,7 +122,7 @@ function FeaturePill({ feature, isActive, onHover }: FeaturePillProps) {
                         <path d="M5 1V9M1 5H9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
                     </svg>
                 </span>
-                <span className="font-sans font-medium text-sm text-foreground">
+                <span className="font-sans font-medium text-xs md:text-sm text-foreground">
                     {feature.name}
                 </span>
             </button>
@@ -176,6 +176,8 @@ export default function Engine() {
     useEffect(() => {
         if (!containerRef.current || !headingRef.current) return;
 
+        const triggers: ScrollTrigger[] = [];
+
         // Animate heading on scroll
         const lines = headingRef.current.querySelectorAll(".headline-line");
 
@@ -185,18 +187,20 @@ export default function Engine() {
             filter: "blur(10px)",
         });
 
-        gsap.to(lines, {
-            y: "0%",
-            opacity: 1,
-            filter: "blur(0px)",
-            duration: 0.6,
-            ease: "causality",
-            stagger: 0.1,
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top 80%",
-            },
+        const headingTrigger = ScrollTrigger.create({
+            trigger: containerRef.current,
+            start: "top 80%",
+            animation: gsap.to(lines, {
+                y: "0%",
+                opacity: 1,
+                filter: "blur(0px)",
+                duration: 0.6,
+                ease: "causality",
+                stagger: 0.1,
+            }),
+            id: "engine-heading",
         });
+        triggers.push(headingTrigger);
 
         // Animate visual elements
         if (visualRef.current) {
@@ -206,30 +210,34 @@ export default function Engine() {
             gsap.set(orbits, { opacity: 0, scale: 0.8 });
             gsap.set(featurePills, { opacity: 0, y: 20 });
 
-            gsap.to(orbits, {
-                opacity: 1,
-                scale: 1,
-                duration: 1,
-                ease: "causality",
-                stagger: 0.2,
-                scrollTrigger: {
-                    trigger: visualRef.current,
-                    start: "top 80%",
-                },
+            const orbitsTrigger = ScrollTrigger.create({
+                trigger: visualRef.current,
+                start: "top 80%",
+                animation: gsap.to(orbits, {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 1,
+                    ease: "causality",
+                    stagger: 0.2,
+                }),
+                id: "engine-orbits",
             });
+            triggers.push(orbitsTrigger);
 
-            gsap.to(featurePills, {
-                opacity: 1,
-                y: 0,
-                duration: 0.6,
-                ease: "causality",
-                stagger: 0.1,
-                delay: 0.5,
-                scrollTrigger: {
-                    trigger: visualRef.current,
-                    start: "top 80%",
-                },
+            const pillsTrigger = ScrollTrigger.create({
+                trigger: visualRef.current,
+                start: "top 80%",
+                animation: gsap.to(featurePills, {
+                    opacity: 1,
+                    y: 0,
+                    duration: 0.6,
+                    ease: "causality",
+                    stagger: 0.1,
+                    delay: 0.5,
+                }),
+                id: "engine-pills",
             });
+            triggers.push(pillsTrigger);
 
             // Continuous orbit animations
             if (outerOrbitRef.current) {
@@ -281,20 +289,20 @@ export default function Engine() {
         }
 
         return () => {
-            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+            triggers.forEach((trigger) => trigger.kill());
         };
     }, []);
 
     return (
-        <div ref={containerRef} className="px-12 bg-background border-t border-foreground/30">
+        <div ref={containerRef} className="px-4 md:px-12 bg-background border-t border-foreground/30">
             <div className="max-w-7xl mx-auto border-l border-r border-foreground/30">
-                <div className="px-8 py-20 space-y-12">
+                <div className="px-4 md:px-8 py-12 md:py-20 space-y-8 md:space-y-12">
                     {/* Header */}
-                    <div className="space-y-12">
+                    <div className="space-y-6 md:space-y-12">
                         <p className="text-foreground/70 uppercase font-sans font-medium text-[10px] tracking-wider">
                             Meet the engine
                         </p>
-                        <h2 ref={headingRef} className="font-serif font-medium text-7xl text-foreground tracking-tighter leading-[1.2] max-w-[780px]">
+                        <h2 ref={headingRef} className="font-serif font-medium text-3xl md:text-7xl text-foreground tracking-tighter leading-[1.2] max-w-[780px]">
                             <span className="block overflow-hidden">
                                 <span className="headline-line block">Where Causality Engine</span>
                             </span>
@@ -305,7 +313,7 @@ export default function Engine() {
                     </div>
 
                     {/* Visual Area */}
-                    <div ref={visualRef} className="relative h-[480px]">
+                    <div ref={visualRef} className="relative h-[280px] md:h-[480px]">
                         {/* Orbits */}
                         <div
                             ref={orbitsContainerRef}
@@ -421,6 +429,7 @@ export default function Engine() {
                             />
                         ))}
                     </div>
+
                 </div>
             </div>
         </div>
