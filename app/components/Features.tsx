@@ -17,25 +17,25 @@ const features: Feature[] = [
         id: "attribution",
         title: "Attribution Reimagined.",
         description: "First/last touch hides the real story. Causality applies AI-adjusted attribution to show the true ROI of every channel.",
-        image: "/images/feature-attribution.jpg",
+        image: "/images/attribution-reimagined-visual.png",
     },
     {
         id: "journey",
         title: "Journey Intelligence.",
         description: "Map every touchpoint across the customer journey. See how channels work together to drive conversions.",
-        image: "/images/feature-journey.jpg",
+        image: "/images/journey-intelligence-visual.png",
     },
     {
         id: "optimization",
         title: "Optimization Queue.",
         description: "Get AI-powered recommendations on where to allocate budget for maximum impact.",
-        image: "/images/feature-optimization.jpg",
+        image: "/images/optimization-queu-visual.png",
     },
     {
         id: "discovery",
         title: "Hidden Value Discovery.",
         description: "Uncover undervalued channels and hidden revenue opportunities your competitors are missing.",
-        image: "/images/feature-discovery.jpg",
+        image: "/images/hidden-value-discovery-visual.png",
     },
 ];
 
@@ -49,6 +49,8 @@ export default function Features() {
     useEffect(() => {
         if (!containerRef.current || !headingRef.current) return;
 
+        const triggers: ScrollTrigger[] = [];
+
         // Animate heading on scroll
         const headingLines = headingRef.current.querySelectorAll(".headline-line");
 
@@ -58,34 +60,38 @@ export default function Features() {
             filter: "blur(10px)",
         });
 
-        gsap.to(headingLines, {
-            y: "0%",
-            opacity: 1,
-            filter: "blur(0px)",
-            duration: 0.6,
-            ease: "causality",
-            stagger: 0.1,
-            scrollTrigger: {
-                trigger: containerRef.current,
-                start: "top 80%",
-            },
+        const headingTrigger = ScrollTrigger.create({
+            trigger: containerRef.current,
+            start: "top 80%",
+            animation: gsap.to(headingLines, {
+                y: "0%",
+                opacity: 1,
+                filter: "blur(0px)",
+                duration: 0.6,
+                ease: "causality",
+                stagger: 0.1,
+            }),
+            id: "features-heading",
         });
+        triggers.push(headingTrigger);
 
         // Create scroll triggers for each section to update active tab
         sectionRefs.current.forEach((section, index) => {
             if (!section) return;
 
-            ScrollTrigger.create({
+            const sectionTrigger = ScrollTrigger.create({
                 trigger: section,
                 start: "top center",
                 end: "bottom center",
                 onEnter: () => setActiveIndex(index),
                 onEnterBack: () => setActiveIndex(index),
+                id: `features-section-${index}`,
             });
+            triggers.push(sectionTrigger);
         });
 
         return () => {
-            ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+            triggers.forEach((trigger) => trigger.kill());
         };
     }, []);
 
@@ -100,12 +106,12 @@ export default function Features() {
 
     return (
         <div ref={containerRef} className="border-b border-foreground/30 relative z-10">
-            <div className="px-12 relative z-10">
+            <div className="px-4 md:px-12 relative z-10">
                 <div className="max-w-7xl mx-auto border-l border-r border-foreground/30">
-                    <div className="px-8 pt-48 pb-16">
+                    <div className="px-4 md:px-8 pt-24 md:pt-48 pb-8 md:pb-16">
                         <h2
                             ref={headingRef}
-                            className="font-serif font-medium text-6xl text-foreground tracking-tighter leading-[1.1] max-w-[564px]"
+                            className="font-serif font-medium text-3xl md:text-6xl text-foreground tracking-tighter leading-[1.1] max-w-[564px]"
                         >
                             <span className="block overflow-hidden">
                                 <span className="headline-line block">Everything you need</span>
@@ -122,11 +128,12 @@ export default function Features() {
             </div>
 
             <div className="bg-neutral-100 relative z-10" data-header-theme="light">
-                <div className="px-12">
+                <div className="px-4 md:px-12">
                     <div className="max-w-7xl mx-auto border-l border-r border-background/16">
+                        {/* Desktop tabs - hidden on mobile */}
                         <div
                             ref={tabsRef}
-                            className="sticky top-0 z-50 bg-neutral-100 pt-20 pb-px px-8"
+                            className="sticky top-0 z-50 bg-neutral-100 pt-12 md:pt-20 pb-px px-4 md:px-8 hidden md:block"
                         >
                             <div className="flex border border-background/16 rounded-t-lg overflow-hidden">
                                 {features.map((feature, index) => (
@@ -161,7 +168,10 @@ export default function Features() {
                             </div>
                         </div>
 
-                        <div className="px-8">
+                        {/* Mobile spacer */}
+                        <div className="h-8 md:hidden" />
+
+                        <div className="px-4 md:px-8">
                             {features.map((feature, index) => (
                                 <div
                                     key={feature.id}
@@ -169,36 +179,43 @@ export default function Features() {
                                         sectionRefs.current[index] = el;
                                     }}
                                 >
-                                    <div className="h-8 border-l border-r border-background/16" />
+                                    <div className="h-4 md:h-8 border-l border-r border-background/16" />
 
                                     {/* Content Card */}
-                                    <div className="bg-white border border-background/16 flex h-[640px]">
+                                    <div className="bg-white border border-background/16 flex flex-col md:flex-row min-h-[400px] md:h-[640px]">
                                         {/* Left - Text */}
-                                        <div className="flex-1 flex flex-col items-start justify-between p-8 overflow-hidden">
-                                            <div className="space-y-6 max-w-[380px]">
-                                                <h3 className="font-serif font-medium text-[32px] text-background tracking-tight leading-[1.2]">
+                                        <div className="flex-1 flex flex-col items-start justify-between p-6 md:p-8 overflow-hidden">
+                                            <div className="space-y-4 md:space-y-6 max-w-[380px]">
+                                                <h3 className="font-serif font-medium text-2xl md:text-[32px] text-background tracking-tight leading-[1.2]">
                                                     {feature.title}
                                                 </h3>
-                                                <p className="font-sans text-lg text-background/70 leading-relaxed">
+                                                <p className="font-sans text-base md:text-lg text-background/70 leading-relaxed">
                                                     {feature.description}
                                                 </p>
                                             </div>
-                                            <Button variant="primary" mode="light" href="/signup">
+                                            <Button variant="primary" mode="light" href="/signup" className="mt-6 md:mt-0">
                                                 Start for free
                                             </Button>
                                         </div>
 
                                         {/* Right - Image */}
-                                        <div className="w-[720px] h-full bg-neutral-200 overflow-hidden relative">
-                                            {/* Placeholder for image */}
-                                            <div className="absolute inset-0 bg-linear-to-br from-neutral-300 to-neutral-400" />
+                                        <div className="w-full md:w-[720px] h-[200px] md:h-full bg-neutral-200 overflow-hidden relative">
+                                            <Image
+                                                src={feature.image}
+                                                alt={feature.title}
+                                                fill
+                                                className="object-cover"
+                                                quality={100}
+                                                sizes="(max-width: 768px) 100vw, 720px"
+                                                priority={index === 0}
+                                            />
                                         </div>
                                     </div>
                                 </div>
                             ))}
 
                             {/* Final Divider */}
-                            <div className="h-8 border-l border-r border-background/16" />
+                            <div className="h-4 md:h-8 border-l border-r border-background/16" />
                         </div>
                     </div>
                 </div>
