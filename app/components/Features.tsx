@@ -193,7 +193,7 @@ export default function Features() {
                                                     {feature.description}
                                                 </p>
                                             </div>
-                                            <Button variant="primary" mode="light" href="/signup" className="mt-6 md:mt-0">
+                                            <Button variant="primary" mode="light" href="https://app.causalityengine.ai/signup" className="mt-6 md:mt-0">
                                                 Start for free
                                             </Button>
                                         </div>

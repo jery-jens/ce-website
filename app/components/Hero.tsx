@@ -181,9 +181,9 @@ export default function Hero() {
               ref={bannerContentRef}
               className="flex items-center justify-center gap-1 md:gap-2"
             >
-              <span className="text-center">We secured $20 million in Series A funding</span>
-              <Link href="/" className="text-foreground/70 underline whitespace-nowrap">
-                Read more
+              <span className="text-center">We recently launched our V1</span>
+              <Link href="https://app.causalityengine.ai/signup" className="text-foreground/70 underline whitespace-nowrap">
+                Try it out
               </Link>
             </div>
           </div>
@@ -201,7 +201,7 @@ export default function Hero() {
             connects the dots, trims waste, and accelerates journey.
           </p>
 
-          <Button variant="primary" href="" className="mx-auto mt-6 md:mt-8">
+          <Button variant="primary" href="https://app.causalityengine.ai/signup" className="mx-auto w-fit mt-6 md:mt-8">
             Start for free
           </Button>
         </div>

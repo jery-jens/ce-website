@@ -74,10 +74,10 @@ export default function CTA() {
                             {`Ad spend wasted.\nRevenue recovered.`}
                         </SplitText>
                         <div className="flex flex-col sm:flex-row gap-2 mt-6 md:mt-8">
-                            <Button variant="primary" mode="light">
+                            <Button variant="primary" mode="light" href="https://app.causalityengine.ai/signup">
                                 Start for free
                             </Button>
-                            <Button variant="secondary" mode="light">
+                            <Button variant="secondary" mode="light" href="https://app.causalityengine.ai/signup">
                                 Book a demo
                             </Button>
                         </div>

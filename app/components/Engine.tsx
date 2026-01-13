@@ -99,9 +99,6 @@ function FeaturePill({ feature, isActive, onHover }: FeaturePillProps) {
                         {feature.description}
                     </p>
                 </div>
-                <div className="p-1">
-                    <div className="bg-neutral-700 h-[100px] rounded" />
-                </div>
             </div>
 
             {/* Pill button */}

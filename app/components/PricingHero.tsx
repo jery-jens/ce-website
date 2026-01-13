@@ -10,13 +10,11 @@ interface PricingFeature {
 }
 
 const features: PricingFeature[] = [
-    { text: "All channels & unlimited journeys" },
+    { text: "Pay only when you run an analysis" },
+    { text: "No historical analysis data retention" },
+    { text: "Full access to all features" },
     { text: "Intelligence-Adjusted Attribution" },
-    { text: "Real-time alerts & leak detection" },
     { text: "Optimization Queue" },
-    { text: "Dashboard embeds & CSV export" },
-    { text: "1 workspace, 10 seats" },
-    { text: "Standard support (24h SLA)" },
 ];
 
 export default function PricingHero() {
@@ -153,18 +151,18 @@ export default function PricingHero() {
                                 <div className="p-6 border-b border-foreground/15 flex flex-col gap-8">
                                     <div className="flex flex-col gap-4">
                                         <h2 className="font-serif text-xl text-foreground tracking-tight">
-                                            One-Time Payment
+                                            Pay-per-use
                                         </h2>
                                         <div className="flex items-end gap-1">
                                             <span className="font-sans font-medium text-3xl text-foreground">
-                                                $1,490
+                                                €99
                                             </span>
                                             <span className="font-sans font-medium text-sm text-foreground pb-1">
-                                                / month
+                                                / analysis
                                             </span>
                                         </div>
                                     </div>
-                                    <Button variant="primary" href="/signup" className="w-full">
+                                    <Button variant="primary" href="https://app.causalityengine.ai/signup" className="w-full">
                                         Start for free
                                     </Button>
                                 </div>
