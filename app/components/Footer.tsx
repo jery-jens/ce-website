@@ -19,8 +19,8 @@ export default function Footer() {
                         </div>
                         <div className="md:max-w-[160px] md:w-full flex flex-col gap-2">
                             <p className="font-medium font-sans text-sm">Account</p>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="/signin">Sign in</AnimatedLink>
-                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="/signup">Sign up</AnimatedLink>
+                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="https://app.causalityengine.ai/signin">Sign in</AnimatedLink>
+                            <AnimatedLink className="font-medium font-sans text-sm text-foreground/70" href="https://app.causalityengine.ai/signup">Sign up</AnimatedLink>
                         </div>
                     </div>
                 </div>
