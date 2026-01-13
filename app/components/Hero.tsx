@@ -202,7 +202,7 @@ export default function Hero() {
           </p>
 
           <Button variant="primary" href="https://app.causalityengine.ai/signup" className="mx-auto w-fit mt-6 md:mt-8">
-            Start for free
+            Try now
           </Button>
         </div>
       </div>

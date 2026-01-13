@@ -75,7 +75,7 @@ export default function CTA() {
                         </SplitText>
                         <div className="flex flex-col sm:flex-row gap-2 mt-6 md:mt-8">
                             <Button variant="primary" mode="light" href="https://app.causalityengine.ai/signup">
-                                Start for free
+                                Try now
                             </Button>
                             <Button variant="secondary" mode="light" href="https://app.causalityengine.ai/signup">
                                 Book a demo

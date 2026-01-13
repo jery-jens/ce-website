@@ -425,7 +425,7 @@ export default function Header() {
               </Button>
             </div>
             <Button variant="primary" mode={isLight && !isOpen ? "light" : "dark"} href="https://app.causalityengine.ai/signup">
-              Try for free
+              Try now
             </Button>
           </div>
         </nav>

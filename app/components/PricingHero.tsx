@@ -163,7 +163,7 @@ export default function PricingHero() {
                                         </div>
                                     </div>
                                     <Button variant="primary" href="https://app.causalityengine.ai/signup" className="w-full">
-                                        Start for free
+                                        Try now
                                     </Button>
                                 </div>
 
