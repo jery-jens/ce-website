@@ -133,7 +133,7 @@ export default function Features() {
                         {/* Desktop tabs - hidden on mobile */}
                         <div
                             ref={tabsRef}
-                            className="sticky top-0 z-50 bg-neutral-100 pt-12 md:pt-20 pb-px px-4 md:px-8 hidden md:block"
+                            className="sticky top-0 z-50 bg-neutral-100 pt-20 pb-px px-8 hidden md:block"
                         >
                             <div className="flex border border-background/16 rounded-t-lg overflow-hidden">
                                 {features.map((feature, index) => (
@@ -168,10 +168,7 @@ export default function Features() {
                             </div>
                         </div>
 
-                        {/* Mobile spacer */}
-                        <div className="h-8 md:hidden" />
-
-                        <div className="px-4 md:px-8">
+                        <div className="px-4 md:px-8 pt-4 md:pt-0">
                             {features.map((feature, index) => (
                                 <div
                                     key={feature.id}
@@ -179,7 +176,7 @@ export default function Features() {
                                         sectionRefs.current[index] = el;
                                     }}
                                 >
-                                    <div className="h-4 md:h-8 border-l border-r border-background/16" />
+                                    <div className={`${index === 0 ? 'hidden md:block' : ''} h-4 md:h-8 border-l border-r border-background/16`} />
 
                                     {/* Content Card */}
                                     <div className="bg-white border border-background/16 flex flex-col md:flex-row min-h-[400px] md:h-[640px]">

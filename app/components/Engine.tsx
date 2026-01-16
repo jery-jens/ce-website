@@ -291,7 +291,7 @@ export default function Engine() {
     }, []);
 
     return (
-        <div ref={containerRef} className="px-4 md:px-12 bg-background border-t border-foreground/30">
+        <div ref={containerRef} className="hidden md:block px-4 md:px-12 bg-background border-t border-foreground/30">
             <div className="max-w-7xl mx-auto border-l border-r border-foreground/30">
                 <div className="px-4 md:px-8 py-12 md:py-20 space-y-8 md:space-y-12">
                     {/* Header */}

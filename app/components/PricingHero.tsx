@@ -105,12 +105,12 @@ export default function PricingHero() {
 
     return (
         <div ref={containerRef} className="relative bg-background overflow-hidden">
-            <div className="px-12">
+            <div className="px-4 md:px-12">
                 <div className="max-w-7xl mx-auto border-l border-r border-foreground/30 relative overflow-hidden">
                     {/* Background image */}
                     <div
                         ref={backgroundRef}
-                        className="absolute left-0 right-0 bottom-0 h-[500px] pointer-events-none"
+                        className="absolute left-0 right-0 bottom-0 h-[300px] md:h-[500px] pointer-events-none"
                     >
                         <div className="relative w-full h-full rotate-180">
                             <Image
@@ -123,14 +123,14 @@ export default function PricingHero() {
                         </div>
                     </div>
 
-                    <div className="flex flex-col items-center gap-16 pt-32 pb-20 px-8 relative z-10">
+                    <div className="flex flex-col items-center gap-8 md:gap-16 pt-24 md:pt-32 pb-12 md:pb-20 px-4 md:px-8 relative z-10">
                         {/* Header */}
-                        <div className="flex flex-col items-center gap-6">
+                        <div className="flex flex-col items-center gap-4 md:gap-6">
                             <p className="text-foreground/70 uppercase font-sans font-medium text-[10px] tracking-wider">
                                 Pricing
                             </p>
                             <div ref={headlineRef} className="text-center">
-                                <h1 className="font-serif font-medium text-7xl tracking-tighter leading-[1.1]">
+                                <h1 className="font-serif font-medium text-4xl md:text-7xl tracking-tighter leading-[1.1]">
                                     <span className="block overflow-hidden pb-1">
                                         <span className="headline-line block">Our pricing.</span>
                                     </span>
