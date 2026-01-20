@@ -479,7 +479,7 @@ export default function Header() {
           {/* Video section - hidden on mobile */}
           <a
             ref={videoRef}
-            href="https://youtube.com"
+            href="https://www.youtube.com/watch?v=1v2oCw8NzyM"
             target="_blank"
             rel="noopener noreferrer"
             className="hidden md:block w-[280px]"
