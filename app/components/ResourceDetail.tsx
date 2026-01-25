@@ -22,6 +22,23 @@ interface ResourceDetailProps {
 }
 
 const portableTextComponents: PortableTextComponents = {
+    unknownMark: ({ children, markType, value }) => {
+        // Handle link marks that were created with random keys during migration
+        if (value?.href) {
+            return (
+                <a
+                    href={value.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-orange-500 hover:underline"
+                >
+                    {children}
+                </a>
+            );
+        }
+        // Return children as-is for truly unknown marks
+        return <>{children}</>;
+    },
     block: {
         h2: ({ children }) => (
             <h2 className="font-serif font-medium text-xl md:text-2xl text-foreground tracking-tight mt-8 first:mt-0">
