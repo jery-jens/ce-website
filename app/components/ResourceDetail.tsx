@@ -1,8 +1,12 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import { gsap } from "@/app/lib/gsap";
 import Link from "next/link";
+import { PortableText, PortableTextComponents } from "@portabletext/react";
+import { PortableTextBlock } from "@portabletext/types";
+import Image from "next/image";
+import { urlFor } from "@/sanity/lib/image";
 
 interface Resource {
     slug: string;
@@ -10,12 +14,92 @@ interface Resource {
     excerpt: string;
     category: string;
     date: string;
-    content: string;
+    body: PortableTextBlock[];
 }
 
 interface ResourceDetailProps {
     resource: Resource;
 }
+
+const portableTextComponents: PortableTextComponents = {
+    block: {
+        h2: ({ children }) => (
+            <h2 className="font-serif font-medium text-xl md:text-2xl text-foreground tracking-tight mt-8 first:mt-0">
+                {children}
+            </h2>
+        ),
+        h3: ({ children }) => (
+            <h3 className="font-sans font-medium text-lg text-foreground mt-6">
+                {children}
+            </h3>
+        ),
+        h4: ({ children }) => (
+            <h4 className="font-sans font-medium text-base text-foreground mt-4">
+                {children}
+            </h4>
+        ),
+        normal: ({ children }) => (
+            <p className="font-sans text-base text-foreground/80 leading-relaxed">
+                {children}
+            </p>
+        ),
+        blockquote: ({ children }) => (
+            <blockquote className="border-l-2 border-foreground/30 pl-4 italic text-foreground/70">
+                {children}
+            </blockquote>
+        ),
+    },
+    list: {
+        bullet: ({ children }) => (
+            <ul className="list-disc list-inside space-y-2 font-sans text-base text-foreground/80 leading-relaxed">
+                {children}
+            </ul>
+        ),
+        number: ({ children }) => (
+            <ol className="list-decimal list-inside space-y-2 font-sans text-base text-foreground/80 leading-relaxed">
+                {children}
+            </ol>
+        ),
+    },
+    listItem: {
+        bullet: ({ children }) => <li>{children}</li>,
+        number: ({ children }) => <li>{children}</li>,
+    },
+    marks: {
+        strong: ({ children }) => <strong className="font-medium">{children}</strong>,
+        em: ({ children }) => <em>{children}</em>,
+        code: ({ children }) => (
+            <code className="bg-foreground/10 px-1 py-0.5 rounded text-sm font-mono">
+                {children}
+            </code>
+        ),
+        link: ({ children, value }) => (
+            <a
+                href={value?.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-orange-500 hover:underline"
+            >
+                {children}
+            </a>
+        ),
+    },
+    types: {
+        image: ({ value }) => {
+            if (!value?.asset) return null;
+            return (
+                <div className="relative w-full h-[300px] md:h-[400px] my-6 rounded-lg overflow-hidden">
+                    <Image
+                        src={urlFor(value).url()}
+                        alt={value.alt || ""}
+                        fill
+                        className="object-cover"
+                    />
+                </div>
+            );
+        },
+    },
+};
 
 export default function ResourceDetail({ resource }: ResourceDetailProps) {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -35,113 +119,6 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
             delay: 0.3,
         });
     }, []);
-
-    // Simple markdown-like content rendering
-    const renderContent = (content: string) => {
-        const lines = content.trim().split("\n");
-        const elements: React.ReactNode[] = [];
-        let currentParagraph: string[] = [];
-        let listItems: string[] = [];
-        let inList = false;
-
-        const flushParagraph = () => {
-            if (currentParagraph.length > 0) {
-                const text = currentParagraph.join(" ").trim();
-                if (text) {
-                    elements.push(
-                        <p key={elements.length} className="font-sans text-base text-foreground/80 leading-relaxed">
-                            {text}
-                        </p>
-                    );
-                }
-                currentParagraph = [];
-            }
-        };
-
-        const flushList = () => {
-            if (listItems.length > 0) {
-                elements.push(
-                    <ul key={elements.length} className="list-disc list-inside space-y-2 font-sans text-base text-foreground/80 leading-relaxed">
-                        {listItems.map((item, i) => (
-                            <li key={i}>{item}</li>
-                        ))}
-                    </ul>
-                );
-                listItems = [];
-                inList = false;
-            }
-        };
-
-        lines.forEach((line) => {
-            const trimmedLine = line.trim();
-
-            // Heading 2
-            if (trimmedLine.startsWith("## ")) {
-                flushParagraph();
-                flushList();
-                elements.push(
-                    <h2 key={elements.length} className="font-serif font-medium text-xl md:text-2xl text-foreground tracking-tight mt-8 first:mt-0">
-                        {trimmedLine.slice(3)}
-                    </h2>
-                );
-                return;
-            }
-
-            // Heading 3
-            if (trimmedLine.startsWith("### ")) {
-                flushParagraph();
-                flushList();
-                elements.push(
-                    <h3 key={elements.length} className="font-sans font-medium text-lg text-foreground mt-6">
-                        {trimmedLine.slice(4)}
-                    </h3>
-                );
-                return;
-            }
-
-            // List item
-            if (trimmedLine.startsWith("- ")) {
-                flushParagraph();
-                inList = true;
-                // Handle bold text in list items
-                const itemText = trimmedLine.slice(2).replace(/\*\*(.*?)\*\*/g, "$1");
-                listItems.push(itemText);
-                return;
-            }
-
-            // Numbered list
-            if (/^\d+\.\s/.test(trimmedLine)) {
-                flushParagraph();
-                if (!inList) {
-                    flushList();
-                }
-                inList = true;
-                const itemText = trimmedLine.replace(/^\d+\.\s/, "").replace(/\*\*(.*?)\*\*/g, "$1");
-                listItems.push(itemText);
-                return;
-            }
-
-            // Empty line
-            if (trimmedLine === "") {
-                flushParagraph();
-                if (inList) {
-                    flushList();
-                }
-                return;
-            }
-
-            // Regular text
-            if (inList) {
-                flushList();
-            }
-            currentParagraph.push(trimmedLine.replace(/\*\*(.*?)\*\*/g, "$1"));
-        });
-
-        flushParagraph();
-        flushList();
-
-        return elements;
-    };
 
     return (
         <div className="bg-background min-h-screen">
@@ -183,7 +160,12 @@ export default function ResourceDetail({ resource }: ResourceDetailProps) {
                     {/* Content */}
                     <div className="px-4 md:px-8 py-12 md:py-16">
                         <div className="animate-in max-w-2xl mx-auto flex flex-col gap-4">
-                            {renderContent(resource.content)}
+                            {resource.body && (
+                                <PortableText
+                                    value={resource.body}
+                                    components={portableTextComponents}
+                                />
+                            )}
                         </div>
                     </div>
                 </div>

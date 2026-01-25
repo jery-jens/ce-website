@@ -127,6 +127,9 @@ export default function Header() {
   const [isLight, setIsLight] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
 
+  // Check if we're on studio pages
+  const isStudio = pathname?.startsWith("/studio");
+
   // Initial header animation (only once on mount)
   useEffect(() => {
     gsap.set(headerRef.current, {
@@ -331,6 +334,11 @@ export default function Header() {
   const handleMenuClick = () => {
     setIsOpen(!isOpen);
   };
+
+  // Hide header on studio pages
+  if (isStudio) {
+    return null;
+  }
 
   return (
     <>
